@@ -6,7 +6,7 @@ namespace Dashboard_WEB_API.DAL.Repositories.GameRepositores
     {
         IQueryable<GameEntity> Games { get; }
 
-        Task<IEnumerable<object>> GetByGenreAsync(string genreId);
+        Task<IEnumerable<GameEntity>> GetByGenreAsync(string genreId);
     }
 
     //public interface IGamesRepository

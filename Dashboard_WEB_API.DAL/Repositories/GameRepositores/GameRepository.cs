@@ -16,25 +16,16 @@ namespace Dashboard_WEB_API.DAL.Repositories.GameRepositores
             .Include(g => g.Genres)
             .Include(g => g.Images);
 
-        public async Task<IEnumerable<object>> GetByGenreAsync(string genreId)
+        public async Task<IEnumerable<GameEntity>> GetByGenreAsync(string genreId)
         {
             return await Games
                 .Where(g => g.Genres.Any(genre => genre.Id == genreId))
+                .Include(g => g.Genres)
+                .Include(g => g.Images)
                 .AsNoTracking()
-                .Select(g => new
-                {
-                    g.Id,
-                    g.Name,
-                    g.Description,
-                    g.Price,
-                    g.ReleaseDate,
-                    g.Publisher,
-                    g.Developer,
-                    Genres = g.Genres.Select(ge => ge.Name).ToList(),
-                    ImageUrls = g.Images.Select(img => img.ImagePath).ToList()
-                })
                 .ToListAsync();
         }
+
     }
 }
 

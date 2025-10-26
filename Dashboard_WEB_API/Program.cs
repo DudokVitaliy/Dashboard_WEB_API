@@ -1,5 +1,8 @@
+using Dashboard_WEB_API.BLL.Services.Game;
+using Dashboard_WEB_API.BLL.Services.Genre;
 using Dashboard_WEB_API.DAL;
 using Dashboard_WEB_API.DAL.Entities.Identity;
+using Dashboard_WEB_API.DAL.Initializer;
 using Dashboard_WEB_API.DAL.Repositories.GameRepositores;
 using Dashboard_WEB_API.DAL.Repositories.GenreRepositoryes;
 using Microsoft.AspNetCore.Identity;
@@ -36,6 +39,9 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 
+builder.Services.AddScoped<IGenreService, GenreService>();  
+builder.Services.AddScoped<IGameService, GameService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -50,5 +56,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.Seed();
 
 app.Run();
