@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dashboard_WEB_API.DAL.Entities
 {
-    public class GameImageEntity
+    public class GameImageEntity : BaseEntity<string>
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public override string Id { get; set; } = Guid.NewGuid().ToString();
         public required string ImagePath { get; set; }
         public bool IsMain { get; set; } = false;
         public required string? GameId { get; set; }

@@ -1,7 +1,10 @@
 using Dashboard_WEB_API.DAL;
 using Dashboard_WEB_API.DAL.Entities.Identity;
+using Dashboard_WEB_API.DAL.Repositories.GameRepositores;
+using Dashboard_WEB_API.DAL.Repositories.GenreRepositoryes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +32,9 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IGameRepository, GameRepository>();
+builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 
 var app = builder.Build();
 

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dashboard_WEB_API.DAL.Entities
 {
-    public class GenreEntity
+    public class GenreEntity : BaseEntity<string>
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public override string Id { get; set; } = Guid.NewGuid().ToString();
         public required string Name { get; set; } = string.Empty;
         public string? NormalizedName { get; set; }
         public ICollection<GameEntity> Games { get; set; } = [];
