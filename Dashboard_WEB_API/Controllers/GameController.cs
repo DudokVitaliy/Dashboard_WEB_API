@@ -1,4 +1,5 @@
 ﻿using Dashboard_WEB_API.BLL.Dtos.Game;
+using Dashboard_WEB_API.BLL.Extensions;
 using Dashboard_WEB_API.BLL.Services.Game;
 using Dashboard_WEB_API.DAL.Entities;
 using Dashboard_WEB_API.DAL.Repositories.GameRepositores;
@@ -26,18 +27,15 @@ namespace Dashboard_WEB_API.Controllers
             if (dto == null)
                 return BadRequest("Дані гри не можуть бути порожніми");
 
-            var result = await _gameService.CreateAsync(dto);
-            return Ok(result);
+            var response = await _gameService.CreateAsync(dto);
+            return this.ToActionResult(response);
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateAsync([FromBody] UpdateGameDto dto)
         {
-            if (dto == null || string.IsNullOrEmpty(dto.Id))
-                return BadRequest("Невірні дані для оновлення");
-
-            var result = await _gameService.UpdateAsync(dto);
-            return Ok(result);
+            var response = await _gameService.UpdateAsync(dto);
+            return this.ToActionResult(response);
         }
 
         [HttpDelete]
@@ -46,41 +44,29 @@ namespace Dashboard_WEB_API.Controllers
             if (string.IsNullOrEmpty(id))
                 return BadRequest("ID не може бути порожнім");
 
-            var result = await _gameService.DeleteAsync(id);
-            return Ok(result);
+            var response = await _gameService.DeleteAsync(id);
+            return this.ToActionResult(response);
         }
 
         [HttpGet("id")]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
-            if (string.IsNullOrEmpty(id))
-                return BadRequest("ID не може бути порожнім");
-
-            var game = await _gameService.GetByIdAsync(id);
-            if (game == null)
-                return NotFound($"Гру з ID {id} не знайдено");
-
-            return Ok(game);
+            var response = await _gameService.GetByIdAsync(id);
+            return this.ToActionResult(response);
         }
 
         [HttpGet("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var games = await _gameService.GetAllAsync();
-            if (!games.Any())
-                return NotFound("Ігор не знайдено");
-
-            return Ok(games);
+            var response = await _gameService.GetAllAsync();
+            return this.ToActionResult(response);
         }
 
         [HttpGet("genre")]
         public async Task<IActionResult> GetByGenreAsync(string genreId)
         {
-            if (string.IsNullOrEmpty(genreId))
-                return BadRequest("GenreId не може бути порожнім");
-
-            var games = await _gameService.GetGamesByGenreAsync(genreId);
-            return Ok(games);
+            var response = await _gameService.GetGamesByGenreAsync(genreId);
+            return this.ToActionResult(response);
         }
     }
 }

@@ -10,11 +10,11 @@ namespace Dashboard_WEB_API.BLL.Services.Game
 {
     public interface IGameService
     {
-        Task<string> CreateAsync(CreateGameDto dto);
-        Task<string> UpdateAsync(UpdateGameDto dto);
-        Task<string> DeleteAsync(string id);
-        Task<GameDto?> GetByIdAsync(string id);
-        Task<IEnumerable<GameDto>> GetAllAsync();
-        Task<IEnumerable<GameDto>> GetGamesByGenreAsync(string genreId);
+        Task<ServiceResponce> CreateAsync(CreateGameDto dto);
+        Task<ServiceResponce> UpdateAsync(UpdateGameDto dto);
+        Task<ServiceResponce> DeleteAsync(string id);
+        Task<ServiceResponce> GetByIdAsync(string id);
+        Task<ServiceResponce> GetAllAsync();
+        Task<ServiceResponce> GetGamesByGenreAsync(string genreId);
     }
 }

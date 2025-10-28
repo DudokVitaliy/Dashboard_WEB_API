@@ -18,7 +18,7 @@ namespace Dashboard_WEB_API.BLL.Services.Game
             _genreRepository = genreRepository;
         }
 
-        public async Task<string> CreateAsync(CreateGameDto dto)
+        public async Task<ServiceResponce> CreateAsync(CreateGameDto dto)
         {
             var genres = new List<GenreEntity>();
             foreach (var genreId in dto.GenreId ?? [])
@@ -48,14 +48,22 @@ namespace Dashboard_WEB_API.BLL.Services.Game
 
             await _gameRepository.CreateAsync(entity);
 
-            return $"Гру '{dto.Name}' створено успішно!";
+            return new ServiceResponce
+            {
+                Message = $"Гру з назвою {dto.Name} успішно створено",
+            };
         }
-        public async Task<string> UpdateAsync(UpdateGameDto dto)
+        public async Task<ServiceResponce> UpdateAsync(UpdateGameDto dto)
         {
             var entity = await _gameRepository.GetByIdAsync(dto.Id);
             if (entity == null)
             {
-                return $"Гру з id: {dto.Id} не знайдено";
+                return new ServiceResponce
+                {
+                    Message = $"Гру з id: {dto.Id} не знайдено",
+                    IsSuccess = false,
+                    HttpStatusCode = System.Net.HttpStatusCode.BadRequest
+                };
             }
             if (dto.Name != null && dto.Name != "string")
                 entity.Name = dto.Name;
@@ -93,69 +101,100 @@ namespace Dashboard_WEB_API.BLL.Services.Game
                 }).ToList();
             }
             await _gameRepository.UpdateAsync(entity);
-            return $"Гру з id: {dto.Id} оновлено успішно!";
+            return new ServiceResponce
+            {
+                Message = $"Гру з id: {dto.Id} успішно оновлено"
+            };
         }
-        public async Task<string> DeleteAsync(string id)
+        public async Task<ServiceResponce> DeleteAsync(string id)
         {
             var entity = await _gameRepository.GetByIdAsync(id);
             if (entity == null)
             {
-                return $"Гру з id: {id} не знайдено";
+                return new ServiceResponce
+                { 
+                    Message = $"Гру з id: {id} не знайдено",
+                    IsSuccess = false,
+                    HttpStatusCode = System.Net.HttpStatusCode.BadRequest
+                };
             }
             await _gameRepository.DeleteAsync(entity);
-            return $"Гру з id: {id} видалено успішно!";
+            return new ServiceResponce
+            {
+                Message = $"Гру з id: {id} успішно видалено",
+                IsSuccess = true,
+                HttpStatusCode = System.Net.HttpStatusCode.OK
+            };
         }
-        public async Task<GameDto?> GetByIdAsync(string id)
+        public async Task<ServiceResponce> GetByIdAsync(string id)
         {
             var game = await _gameRepository.GetByIdAsync(id);
             if (game == null)
             {
                 return null;
             }
-            return new GameDto
+            return new ServiceResponce
             {
-                Id = game.Id,
-                Name = game.Name,
-                Description = game.Description,
-                Price = game.Price,
-                ReleaseDate = game.ReleaseDate,
-                Publisher = game.Publisher,
-                Developer = game.Developer,
-                GenreId = game.Genres.Select(g => g.Id).ToList(),
-                ImageUrl = game.Images.Select(i => i.ImagePath).ToList()
+                Message = "Успішне отримання гри за id",
+                IsSuccess = true,
+                HttpStatusCode = System.Net.HttpStatusCode.OK,
+                Data = new GameDto
+                {
+                    Id = game.Id,
+                    Name = game.Name,
+                    Description = game.Description,
+                    Price = game.Price,
+                    ReleaseDate = game.ReleaseDate,
+                    Publisher = game.Publisher,
+                    Developer = game.Developer,
+                    GenreId = game.Genres.Select(g => g.Id).ToList(),
+                    ImageUrl = game.Images.Select(i => i.ImagePath).ToList()
+                },
             };
         }
-        public async Task<IEnumerable<GameDto>> GetAllAsync()
+        public async Task<ServiceResponce> GetAllAsync()
         {
             var games = await _gameRepository.GetAll().ToListAsync();
-            return games.Select(game => new GameDto
+            return new ServiceResponce
             {
-                Id = game.Id,
-                Name = game.Name,
-                Description = game.Description,
-                Price = game.Price,
-                ReleaseDate = game.ReleaseDate,
-                Publisher = game.Publisher,
-                Developer = game.Developer,
-                GenreId = game.Genres.Select(g => g.Id).ToList(),
-                ImageUrl = game.Images.Select(i => i.ImagePath).ToList()
-            });
+                Message = "Успішне отримання всіх ігор",
+                IsSuccess = true,
+                HttpStatusCode = System.Net.HttpStatusCode.OK,
+                Data = games.Select(game => new GameDto
+                {
+                    Id = game.Id,
+                    Name = game.Name,
+                    Description = game.Description,
+                    Price = game.Price,
+                    ReleaseDate = game.ReleaseDate,
+                    Publisher = game.Publisher,
+                    Developer = game.Developer,
+                    GenreId = game.Genres.Select(g => g.Id).ToList(),
+                    ImageUrl = game.Images.Select(i => i.ImagePath).ToList()
+                }),
+            };
         }
-        public async Task<IEnumerable<GameDto>> GetGamesByGenreAsync(string genreId)
+        public async Task<ServiceResponce> GetGamesByGenreAsync(string genreId)
         {
             var games = await _gameRepository.GetByGenreAsync(genreId);
-            return games.Select(g => new GameDto
+            return new ServiceResponce
             {
-                Id = g.Id,
-                Name = g.Name,
-                Description = g.Description,
-                Price = g.Price,
-                ReleaseDate = g.ReleaseDate,
-                Publisher = g.Publisher,
-                Developer = g.Developer,
-                GenreId = g.Genres.Select(ge => ge.Id).ToList(),
-                ImageUrl = g.Images.Select(img => img.ImagePath).ToList()
-            });
+                Message = "Успішне отримання ігор за жанром",
+                IsSuccess = true,
+                HttpStatusCode = System.Net.HttpStatusCode.OK,
+                Data = games.Select(game => new GameDto
+                {
+                    Id = game.Id,
+                    Name = game.Name,
+                    Description = game.Description,
+                    Price = game.Price,
+                    ReleaseDate = game.ReleaseDate,
+                    Publisher = game.Publisher,
+                    Developer = game.Developer,
+                    GenreId = game.Genres.Select(g => g.Id).ToList(),
+                    ImageUrl = game.Images.Select(i => i.ImagePath).ToList()
+                }),
+            };
         }
     }
 }

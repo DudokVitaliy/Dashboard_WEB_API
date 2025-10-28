@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Dashboard_WEB_API.DAL\Dashboard_WEB_API.DAL.csproj" />
   </ItemGroup>
 
