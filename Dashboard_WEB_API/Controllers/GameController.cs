@@ -41,9 +41,6 @@ namespace Dashboard_WEB_API.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteAsync(string id)
         {
-            if (string.IsNullOrEmpty(id))
-                return BadRequest("ID не може бути порожнім");
-
             var response = await _gameService.DeleteAsync(id);
             return this.ToActionResult(response);
         }
