@@ -1,5 +1,6 @@
 using Dashboard_WEB_API.BLL.Services.Game;
 using Dashboard_WEB_API.BLL.Services.Genre;
+using Dashboard_WEB_API.BLL.Settings;
 using Dashboard_WEB_API.DAL;
 using Dashboard_WEB_API.DAL.Entities.Identity;
 using Dashboard_WEB_API.DAL.Initializer;
@@ -47,6 +48,8 @@ builder.Services.AddScoped<IGenreRepository, GenreRepository>();
 
 builder.Services.AddScoped<IGenreService, GenreService>();  
 builder.Services.AddScoped<IGameService, GameService>();
+
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 var app = builder.Build();
 

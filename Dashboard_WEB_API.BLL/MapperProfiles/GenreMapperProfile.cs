@@ -17,6 +17,12 @@ namespace Dashboard_WEB_API.BLL.MapperProfiles
             // UpdateGanreDto to GenreEntity
             CreateMap<UpdateGenreDto, GenreEntity>()
                 .ForMember(dest => dest.NormalizedName, opt => opt.MapFrom(src => src.Name.ToUpper()));
+            // CreateGenreDto to GenreEntity
+            CreateMap<CreateGenreDto, GenreEntity>()
+                .ForMember(dest => dest.NormalizedName, opt => opt.MapFrom(src => src.Name.ToUpper()));
+            // GenreEntity to GenreDto
+            CreateMap<GenreEntity, GenreDto>();
         }
+
     }
 }

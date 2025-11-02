@@ -5,7 +5,7 @@ namespace Dashboard_WEB_API.BLL.Extensions
 {
     public static class ControllerBaseExtension
     {
-        public static IActionResult ToActionResult(this ControllerBase controller, ServiceResponce response)
+        public static IActionResult ToActionResult(this ControllerBase controller, ServiceResponse response)
         {
             return controller.StatusCode((int)response.HttpStatusCode, response);
         }

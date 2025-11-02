@@ -1,5 +1,7 @@
 ﻿using Dashboard_WEB_API.DAL.Entities;
+using Dashboard_WEB_API.DAL.Entities.Identity;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -16,8 +18,40 @@ namespace Dashboard_WEB_API.DAL.Initializer
         {
             using var scope = app.ApplicationServices.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
             await context.Database.MigrateAsync();
+
+            if (!await roleManager.Roles.AnyAsync())
+            {
+                var roleAdmin = new ApplicationRole { Name = "admin" };
+                var roleUser = new ApplicationRole { Name = "user" };
+
+                await roleManager.CreateAsync(roleAdmin);
+                await roleManager.CreateAsync(roleUser);
+
+                var admin = new ApplicationUser
+                {
+                    Email = "admin@mail.com",
+                    EmailConfirmed = true,
+                    UserName = "admin"
+                };
+
+                var user = new ApplicationUser
+                {
+                    Email = "user@mail.com",
+                    EmailConfirmed = true,
+                    UserName = "user"
+                };
+
+                await userManager.CreateAsync(admin, "qwerty");
+                await userManager.CreateAsync(user, "qwerty");
+
+                await userManager.AddToRoleAsync(admin, "admin");
+                await userManager.AddToRoleAsync(user, "user");
+            }
+
             if (!context.Genres.Any())
             {
                 var genres = new GenreEntity[]

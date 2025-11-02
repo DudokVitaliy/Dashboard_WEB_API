@@ -18,7 +18,7 @@ namespace Dashboard_WEB_API.BLL.Services.Game
             _genreRepository = genreRepository;
         }
 
-        public async Task<ServiceResponce> CreateAsync(CreateGameDto dto)
+        public async Task<ServiceResponse> CreateAsync(CreateGameDto dto)
         {
             var genres = new List<GenreEntity>();
             foreach (var genreId in dto.GenreId ?? [])
@@ -48,17 +48,17 @@ namespace Dashboard_WEB_API.BLL.Services.Game
 
             await _gameRepository.CreateAsync(entity);
 
-            return new ServiceResponce
+            return new ServiceResponse
             {
                 Message = $"Гру з назвою {dto.Name} успішно створено",
             };
         }
-        public async Task<ServiceResponce> UpdateAsync(UpdateGameDto dto)
+        public async Task<ServiceResponse> UpdateAsync(UpdateGameDto dto)
         {
             var entity = await _gameRepository.GetByIdAsync(dto.Id);
             if (entity == null)
             {
-                return new ServiceResponce
+                return new ServiceResponse
                 {
                     Message = $"Гру з id: {dto.Id} не знайдено",
                     IsSuccess = false,
@@ -101,17 +101,17 @@ namespace Dashboard_WEB_API.BLL.Services.Game
                 }).ToList();
             }
             await _gameRepository.UpdateAsync(entity);
-            return new ServiceResponce
+            return new ServiceResponse
             {
                 Message = $"Гру з id: {dto.Id} успішно оновлено"
             };
         }
-        public async Task<ServiceResponce> DeleteAsync(string id)
+        public async Task<ServiceResponse> DeleteAsync(string id)
         {
             var entity = await _gameRepository.GetByIdAsync(id);
             if (entity == null)
             {
-                return new ServiceResponce
+                return new ServiceResponse
                 { 
                     Message = $"Гру з id: {id} не знайдено",
                     IsSuccess = false,
@@ -119,21 +119,21 @@ namespace Dashboard_WEB_API.BLL.Services.Game
                 };
             }
             await _gameRepository.DeleteAsync(entity);
-            return new ServiceResponce
+            return new ServiceResponse
             {
                 Message = $"Гру з id: {id} успішно видалено",
                 IsSuccess = true,
                 HttpStatusCode = System.Net.HttpStatusCode.OK
             };
         }
-        public async Task<ServiceResponce> GetByIdAsync(string id)
+        public async Task<ServiceResponse> GetByIdAsync(string id)
         {
             var game = await _gameRepository.GetByIdAsync(id);
             if (game == null)
             {
                 return null;
             }
-            return new ServiceResponce
+            return new ServiceResponse
             {
                 Message = "Успішне отримання гри за id",
                 IsSuccess = true,
@@ -152,10 +152,10 @@ namespace Dashboard_WEB_API.BLL.Services.Game
                 },
             };
         }
-        public async Task<ServiceResponce> GetAllAsync()
+        public async Task<ServiceResponse> GetAllAsync()
         {
             var games = await _gameRepository.GetAll().ToListAsync();
-            return new ServiceResponce
+            return new ServiceResponse
             {
                 Message = "Успішне отримання всіх ігор",
                 IsSuccess = true,
@@ -174,10 +174,10 @@ namespace Dashboard_WEB_API.BLL.Services.Game
                 }),
             };
         }
-        public async Task<ServiceResponce> GetGamesByGenreAsync(string genreId)
+        public async Task<ServiceResponse> GetGamesByGenreAsync(string genreId)
         {
             var games = await _gameRepository.GetByGenreAsync(genreId);
-            return new ServiceResponce
+            return new ServiceResponse
             {
                 Message = "Успішне отримання ігор за жанром",
                 IsSuccess = true,

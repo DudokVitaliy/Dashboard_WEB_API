@@ -3,7 +3,7 @@
 
 namespace Dashboard_WEB_API.BLL.Services
 {
-    public class ServiceResponce
+    public class ServiceResponse
     {
         public required string Message { get; set; }
         public bool IsSuccess { get; set; } = true;

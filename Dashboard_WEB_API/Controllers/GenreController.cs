@@ -36,7 +36,7 @@ namespace Dashboard_WEB_API.Controllers
         {
             if(string.IsNullOrEmpty(id))
             {
-                var validationResponse = new ServiceResponce
+                var validationResponse = new ServiceResponse
                 {
                     Message = "Ідентифікатор жанру не може бути порожнім",
                     IsSuccess = false,
