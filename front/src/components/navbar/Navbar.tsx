@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import {Link} from 'react-router'
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -123,11 +124,29 @@ const Navbar: React.FC = () => {
             ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
+            {/* <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
+            <Box>
+                <Link to={'/login'}>  
+                <Button
+                    variant='contained'
+                    color='success'
+                    sx={{mx:1}}>
+                    Логін
+                </Button>
+                </Link>
+                <Link to={'/register'}>  
+                <Button
+                    variant='contained'
+                    color='error'
+                    sx={{mx:1}}>
+                    Зареєструватися
+                </Button>
+            </Link>
+            </Box>
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"

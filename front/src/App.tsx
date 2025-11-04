@@ -1,8 +1,16 @@
-import Navbar from './components/navbar/Navbar';
+import { Route, Routes } from 'react-router';
+import DefaultLayout from './components/layout/defaultLayout';
+import MainPage from './components/mainPage/mainPage';
+import LoginPage from './pages/loginPage/LoginPage';
 function App() {
   return (
     <>
-      <Navbar />
+      <Routes>
+        <Route element={<DefaultLayout />}>
+          <Route index element={<MainPage />} />
+          <Route path='/login' element={<LoginPage />} />
+        </Route>
+      </Routes>
     </>
   )
 }
