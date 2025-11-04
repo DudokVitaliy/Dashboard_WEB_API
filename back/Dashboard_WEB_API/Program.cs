@@ -51,6 +51,18 @@ builder.Services.AddScoped<IGameService, GameService>();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
+string corsName = "AllowedAll";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(corsName, builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -65,6 +77,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors(corsName);
 
 app.Seed();
 

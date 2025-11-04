@@ -15,6 +15,10 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from './components/ForgotPassword';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from './components/CustomeIcons';
+import {useFormik} from 'formik';
+import type { LoginModel } from './types';
+import axios from 'axios';
+import { apiBaseUrl } from '../../env';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -34,7 +38,6 @@ const Card = styled(MuiCard)(({ theme }) => ({
       'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
   }),
 }));
-
 const SignInContainer = styled(Stack)(({ theme }) => ({
   height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
   minHeight: '100%',
@@ -57,61 +60,34 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
     }),
   },
 }));
-
-
 const LoginPage = () => {
-    const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
   };
-
   const handleClose = () => {
     setOpen(false);
   };
+  const handleSubmit = async (values: LoginModel) => {
+        const response = axios({
+            method: 'post',
+            url: `${apiBaseUrl}/auth/login`,
+            data: values,
+        })
+        console.log('Form values:', values);
+    };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+    const InitialValues: LoginModel = {
+      login: '',
+      password: '',
+    };
+
+    const formik = useFormik<LoginModel>({
+    initialValues: InitialValues,
+    onSubmit: handleSubmit,
     });
-  };
 
-  const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement;
-    const password = document.getElementById('password') as HTMLInputElement;
-
-    let isValid = true;
-
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
-    }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
-    }
-
-    return isValid;
-  };
 
   return (
     <>
@@ -127,7 +103,7 @@ const LoginPage = () => {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={formik.handleSubmit}
             noValidate
             sx={{
               display: 'flex',
@@ -137,27 +113,26 @@ const LoginPage = () => {
             }}
           >
             <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
+              <FormLabel htmlFor="email">Логін</FormLabel>
               <TextField
-                error={emailError}
-                helperText={emailErrorMessage}
-                id="email"
-                type="email"
-                name="email"
-                placeholder="your@email.com"
-                autoComplete="email"
+                id="login"
+                type="text"
+                name="login"
+                placeholder="yousername"
+                autoComplete="login"
                 autoFocus
                 required
                 fullWidth
                 variant="outlined"
-                color={emailError ? 'error' : 'primary'}
+                color={'primary'}
+                onChange={formik.handleChange}
+                value={formik.values.login}
+                onBlur={formik.handleBlur}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
+              <FormLabel htmlFor="password">Пароль</FormLabel>
               <TextField
-                error={passwordError}
-                helperText={passwordErrorMessage}
                 name="password"
                 placeholder="••••••"
                 type="password"
@@ -167,7 +142,10 @@ const LoginPage = () => {
                 required
                 fullWidth
                 variant="outlined"
-                color={passwordError ? 'error' : 'primary'}
+                color='primary'
+                onChange={formik.handleChange}
+                value={formik.values.password}
+                onBlur={formik.handleBlur}
               />
             </FormControl>
             <FormControlLabel
@@ -179,7 +157,6 @@ const LoginPage = () => {
               type="submit"
               fullWidth
               variant="contained"
-              onClick={validateInputs}
             >
               Sign in
             </Button>

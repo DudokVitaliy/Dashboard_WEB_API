@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router';
-import DefaultLayout from './components/layout/defaultLayout';
+import DefaultLayout from './components/layout/DefaultLayout';
 import MainPage from './components/mainPage/mainPage';
 import LoginPage from './pages/loginPage/LoginPage';
 function App() {
