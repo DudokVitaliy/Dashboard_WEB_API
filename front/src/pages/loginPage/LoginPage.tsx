@@ -70,12 +70,12 @@ const LoginPage = () => {
     setOpen(false);
   };
   const handleSubmit = async (values: LoginModel) => {
-        const response = axios({
+        const response = await axios({
             method: 'post',
-            url: `${apiBaseUrl}/auth/login`,
+            url: `${apiBaseUrl}/Auth/Login`,
             data: values,
         })
-        console.log('Form values:', values);
+        console.log(response);
     };
 
     const InitialValues: LoginModel = {

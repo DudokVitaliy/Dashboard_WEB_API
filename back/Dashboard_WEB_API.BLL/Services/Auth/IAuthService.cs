@@ -1,14 +1,12 @@
 ﻿using Dashboard_WEB_API.BLL.Dtos.Auth;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Dashboard_WEB_API.BLL.Services;
 
-namespace Dashboard_WEB_API.BLL.Services.Auth
+namespace PD421_Dashboard_WEB_API.BLL.Services.Auth
 {
     public interface IAuthService
     {
         Task<ServiceResponse> LoginAsync(LoginDto dto);
+        Task<ServiceResponse> RegisterAsync(RegisterDto dto);
+        Task<ServiceResponse> ConfirmEmailAsync(string userId, string token);
     }
 }

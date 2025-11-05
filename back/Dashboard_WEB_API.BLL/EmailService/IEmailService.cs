@@ -1,6 +1,6 @@
-﻿using Dashboard_WEB_API.DAL.Entities.Identity;
+﻿
 
-namespace Dashboard_WEB_API.BLL.Services.EmailService
+namespace PD421_Dashboard_WEB_API.BLL.Services.EmailService
 {
     public interface IEmailService
     {

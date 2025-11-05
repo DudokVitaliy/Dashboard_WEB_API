@@ -1,10 +1,10 @@
 ﻿
-using Microsoft.Extensions.Options;
 using Dashboard_WEB_API.BLL.Settings;
+using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 
-namespace Dashboard_WEB_API.BLL.Services.EmailService
+namespace PD421_Dashboard_WEB_API.BLL.Services.EmailService
 {
     public class EmailService : IEmailService
     {

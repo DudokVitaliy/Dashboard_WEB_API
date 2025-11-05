@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using Dashboard_WEB_API.BLL.Dtos.Auth;
 using Dashboard_WEB_API.BLL.Services;
-using Dashboard_WEB_API.BLL.Services.Auth;
-using Dashboard_WEB_API.BLL.Services.EmailService;
 using Dashboard_WEB_API.BLL.Settings;
 using Dashboard_WEB_API.DAL.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +12,8 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+
+using PD421_Dashboard_WEB_API.BLL.Services.EmailService;
 
 namespace PD421_Dashboard_WEB_API.BLL.Services.Auth
 {
