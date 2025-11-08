@@ -146,6 +146,8 @@ namespace PD421_Dashboard_WEB_API.BLL.Services.Auth
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(entity);
             var bytes = Encoding.UTF8.GetBytes(token);
             string base64Token = Convert.ToBase64String(bytes);
+            if (string.IsNullOrWhiteSpace(entity.Email))
+                throw new ArgumentException("User email is empty, cannot send confirmation email.");
 
             await _emailService.SendEmailConfirmMessageAsync(entity.Email!, base64Token, entity.Id);
 

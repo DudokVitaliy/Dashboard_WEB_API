@@ -7,7 +7,6 @@ import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import MuiLink from '@mui/material/Link';
-import { Link } from 'react-router';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
@@ -19,6 +18,11 @@ import {useFormik} from 'formik';
 import type { LoginModel } from './types';
 import axios from 'axios';
 import { apiBaseUrl } from '../../env';
+import type { ServiceResponse } from './services/types';
+import { useDispatch } from "react-redux";
+import { loginSucess } from "../../store/slices/authSlice";
+import { Link, useNavigate } from "react-router";
+import { jwtDecode } from "jwt-decode";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -62,6 +66,8 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 const LoginPage = () => {
   const [open, setOpen] = React.useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -69,13 +75,28 @@ const LoginPage = () => {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleSubmit = async (values: LoginModel) => {
-        const response = await axios({
-            method: 'post',
-            url: `${apiBaseUrl}/Auth/Login`,
-            data: values,
-        })
-        console.log(response);
+ const handleSubmit = async (values: LoginModel) => {
+        try {
+            const response = await axios<ServiceResponse<string>>({
+                url: `${apiBaseUrl}/auth/login`,
+                method: "post",
+                data: values,
+            });
+
+            const { data } = response;
+            const token = data.data;
+            if (token) {
+                localStorage.setItem("token", token);
+                dispatch(loginSucess(token));
+                navigate('/');
+            }
+        } catch (error: any) {
+            if ("response" in error) {
+                const { response } = error;
+                const { data } = response;
+                console.log(data);
+            }
+        }
     };
 
     const InitialValues: LoginModel = {

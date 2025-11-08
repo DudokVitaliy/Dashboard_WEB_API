@@ -83,11 +83,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors(corsName);
+
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseCors(corsName);
 
 app.Seed();
 
