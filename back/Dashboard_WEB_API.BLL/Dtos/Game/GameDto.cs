@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dashboard_WEB_API.DAL.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,8 @@ namespace Dashboard_WEB_API.BLL.Dtos.Game
         public DateTime ReleaseDate { get; set; }
         public string? Publisher { get; set; }
         public string? Developer { get; set; }
-        public List<string> GenreId { get; set; } = [];
-        public List<string> ImageUrl { get; set; } = [];
+        
+        public GameImageDto? MainImage { get; set; }
+        public List<GameImageDto> Images { get; set; } = [];
     }
 }

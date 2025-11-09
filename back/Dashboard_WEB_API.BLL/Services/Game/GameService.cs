@@ -196,7 +196,12 @@ namespace Dashboard_WEB_API.BLL.Services.Game
             var game = await _gameRepository.GetByIdAsync(id);
             if (game == null)
             {
-                return null;
+                return new ServiceResponse
+                {
+                    Message = $"Гру з id: {id} не знайдено",
+                    IsSuccess = false,
+                    HttpStatusCode = System.Net.HttpStatusCode.BadRequest
+                };
             }
             return new ServiceResponse
             {
@@ -212,31 +217,23 @@ namespace Dashboard_WEB_API.BLL.Services.Game
                     ReleaseDate = game.ReleaseDate,
                     Publisher = game.Publisher,
                     Developer = game.Developer,
-                    GenreId = game.Genres.Select(g => g.Id).ToList(),
-                    ImageUrl = game.Images.Select(i => i.ImagePath).ToList()
                 },
             };
         }
         public async Task<ServiceResponse> GetAllAsync()
         {
             var games = await _gameRepository.GetAll().ToListAsync();
+
+            var dtos = games
+                .Select(game => _mapper.Map<GameDto>(game))
+                .ToList();
+
             return new ServiceResponse
             {
                 Message = "Успішне отримання всіх ігор",
                 IsSuccess = true,
                 HttpStatusCode = System.Net.HttpStatusCode.OK,
-                Data = games.Select(game => new GameDto
-                {
-                    Id = game.Id,
-                    Name = game.Name,
-                    Description = game.Description,
-                    Price = game.Price,
-                    ReleaseDate = game.ReleaseDate,
-                    Publisher = game.Publisher,
-                    Developer = game.Developer,
-                    GenreId = game.Genres.Select(g => g.Id).ToList(),
-                    ImageUrl = game.Images.Select(i => i.ImagePath).ToList()
-                }),
+                Data = dtos
             };
         }
         public async Task<ServiceResponse> GetGamesByGenreAsync(string genreId)
@@ -256,8 +253,6 @@ namespace Dashboard_WEB_API.BLL.Services.Game
                     ReleaseDate = game.ReleaseDate,
                     Publisher = game.Publisher,
                     Developer = game.Developer,
-                    GenreId = game.Genres.Select(g => g.Id).ToList(),
-                    ImageUrl = game.Images.Select(i => i.ImagePath).ToList()
                 }),
             };
         }

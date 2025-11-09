@@ -10,13 +10,13 @@ namespace Dashboard_WEB_API.BLL.Services.Storage
     public class StorageService : IStorageService
     {
 
-        public async Task<string?> SaveImageAsync(IFormFile file, string folderPath)
+        public async Task<string> SaveImageAsync(IFormFile file, string folderPath)
         {
             try
             {
                 var types = file.ContentType.Split('/');
                 if (types.Length != 2 || types[0] != "image")
-                    return null;
+                    return string.Empty;
 
                 var extension = Path.GetExtension(file.FileName);
                 var imageName = $"{Guid.NewGuid()}{extension}";
@@ -25,17 +25,17 @@ namespace Dashboard_WEB_API.BLL.Services.Storage
                 {
                     await file.CopyToAsync(stream);
                 }
-                return imageName;
+                return imageName ?? string.Empty;
             }
             catch (Exception)
             {
-                return null;
+                return string.Empty;
             }
             
 
         }
 
-        public async Task<IEnumerable<string?>> SaveImagesAsync(IEnumerable<IFormFile> files, string folderPath)
+        public async Task<IEnumerable<string>> SaveImagesAsync(IEnumerable<IFormFile> files, string folderPath)
         {
             try
             {
@@ -45,12 +45,12 @@ namespace Dashboard_WEB_API.BLL.Services.Storage
             }
             catch (Exception)
             {
-
-                return null;
+                return Enumerable.Empty<string>();
             }
         }
         public async Task<bool> DeleteAllImagesAsync(string folderPath)
         {
+            await Task.Yield();
             try
             {
                 if (Directory.Exists(folderPath))
