@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Dashboard_WEB_API.DAL\Dashboard_WEB_API.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="storage\images\" />
+  </ItemGroup>
+
 </Project>

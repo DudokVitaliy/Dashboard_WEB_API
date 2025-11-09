@@ -1,5 +1,6 @@
 using Dashboard_WEB_API.BLL.Services.Game;
 using Dashboard_WEB_API.BLL.Services.Genre;
+using Dashboard_WEB_API.BLL.Services.Storage;
 using Dashboard_WEB_API.BLL.Settings;
 using Dashboard_WEB_API.DAL;
 using Dashboard_WEB_API.DAL.Entities.Identity;
@@ -9,6 +10,7 @@ using Dashboard_WEB_API.DAL.Repositories.GenreRepositoryes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using PD421_Dashboard_WEB_API.BLL.Services.Auth;
 using PD421_Dashboard_WEB_API.BLL.Services.EmailService;
 using System.Reflection;
@@ -54,6 +56,7 @@ builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IStorageService, StorageService>();
 
 // Add settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -84,6 +87,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors(corsName);
+
+app.AddStaticFiles(app.Environment);
 
 app.UseAuthorization();
 

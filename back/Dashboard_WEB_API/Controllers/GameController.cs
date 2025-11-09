@@ -4,8 +4,10 @@ using Dashboard_WEB_API.BLL.Services.Game;
 using Dashboard_WEB_API.DAL.Entities;
 using Dashboard_WEB_API.DAL.Repositories.GameRepositores;
 using Dashboard_WEB_API.DAL.Repositories.GenreRepositoryes;
+using Dashboard_WEB_API.settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Dashboard_WEB_API.Controllers
@@ -15,20 +17,27 @@ namespace Dashboard_WEB_API.Controllers
     public class GameController : ControllerBase
     {
         private readonly IGameService _gameService;
+        private readonly IWebHostEnvironment _environment;
 
-        public GameController(IGameService gameService)
+        public GameController(IGameService gameService, IWebHostEnvironment environment)
         {
             _gameService = gameService;
+            _environment = environment;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateGameDto dto)
+        public async Task<IActionResult> CreateAsync([FromForm] CreateGameDto dto)
         {
-            if (dto == null)
-                return BadRequest("Дані гри не можуть бути порожніми");
-
-            var response = await _gameService.CreateAsync(dto);
+            string rootPath = _environment.ContentRootPath;
+            string imagesPath = Path.Combine(rootPath, StaticFilesSettings.StorageDirectory, StaticFilesSettings.ImagesDirectory);
+            var response = await _gameService.CreateAsync(dto, imagesPath);
             return this.ToActionResult(response);
+
+            //if (dto == null)
+            //    return BadRequest("Дані гри не можуть бути порожніми");
+
+            //var response = await _gameService.CreateAsync(dto);
+            //return this.ToActionResult(response);
         }
 
         [HttpPut]
@@ -41,7 +50,9 @@ namespace Dashboard_WEB_API.Controllers
         [HttpDelete]
         public async Task<IActionResult> DeleteAsync(string id)
         {
-            var response = await _gameService.DeleteAsync(id);
+            string rootPath = _environment.ContentRootPath;
+            string imagesPath = Path.Combine(rootPath, StaticFilesSettings.StorageDirectory, StaticFilesSettings.ImagesDirectory);
+            var response = await _gameService.DeleteAsync(id, imagesPath);
             return this.ToActionResult(response);
         }
 
