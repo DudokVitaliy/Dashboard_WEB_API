@@ -193,7 +193,10 @@ namespace Dashboard_WEB_API.BLL.Services.Game
         }
         public async Task<ServiceResponse> GetByIdAsync(string id)
         {
-            var game = await _gameRepository.GetByIdAsync(id);
+            var game = await _gameRepository.Games
+                .Include(g => g.Images) 
+                .FirstOrDefaultAsync(g => g.Id == id);
+
             if (game == null)
             {
                 return new ServiceResponse
@@ -203,30 +206,25 @@ namespace Dashboard_WEB_API.BLL.Services.Game
                     HttpStatusCode = System.Net.HttpStatusCode.BadRequest
                 };
             }
+
+            var gameDto = _mapper.Map<GameDto>(game);
+
             return new ServiceResponse
             {
                 Message = "Успішне отримання гри за id",
                 IsSuccess = true,
                 HttpStatusCode = System.Net.HttpStatusCode.OK,
-                Data = new GameDto
-                {
-                    Id = game.Id,
-                    Name = game.Name,
-                    Description = game.Description,
-                    Price = game.Price,
-                    ReleaseDate = game.ReleaseDate,
-                    Publisher = game.Publisher,
-                    Developer = game.Developer,
-                },
+                Data = gameDto
             };
         }
+
         public async Task<ServiceResponse> GetAllAsync()
         {
-            var games = await _gameRepository.GetAll().ToListAsync();
+            var entities = await _gameRepository.Games
+                .Include(g => g.Images)
+                .ToListAsync();
 
-            var dtos = games
-                .Select(game => _mapper.Map<GameDto>(game))
-                .ToList();
+            var dtos = _mapper.Map<List<GameDto>>(entities);
 
             return new ServiceResponse
             {

@@ -56,7 +56,7 @@ namespace Dashboard_WEB_API.Controllers
             return this.ToActionResult(response);
         }
 
-        [HttpGet("id")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             var response = await _gameService.GetByIdAsync(id);

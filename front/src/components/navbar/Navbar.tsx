@@ -19,7 +19,11 @@ import { logout } from '../../store/slices/authSlice';
 
 
 
-const pages = ['Products', 'Pricing', 'Blog'];
+const pages = [
+  {title: 'Games', url: 'game'}, 
+  {title: 'Pricing', url : "/"}, 
+  {title: 'Blog', url : "/"}
+];
 const settings = ['Profile', 'Account', 'Dashboard'];
 
 const Navbar: React.FC = () => {
@@ -98,8 +102,10 @@ const Navbar: React.FC = () => {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
+                <MenuItem key={page.title} onClick={handleCloseNavMenu}>
+                  <Link to={page.url} style={{textDecoration: 'none', color: 'inherit'}}>
+                    <Typography sx={{ textAlign: 'center' }}>{page.title}</Typography>
+                  </Link>
                 </MenuItem>
               ))}
             </Menu>
@@ -125,13 +131,15 @@ const Navbar: React.FC = () => {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
+              <Link to={page.url} key={page.title} style={{textDecoration: 'none'}}>
               <Button
-                key={page}
+                key={page.title}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
+                >
+                {page.title}
               </Button>
+              </Link>
             ))}
           </Box>
           {isAuth ? (

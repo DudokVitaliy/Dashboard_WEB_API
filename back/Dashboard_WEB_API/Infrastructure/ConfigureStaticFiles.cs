@@ -1,5 +1,6 @@
 ﻿using Dashboard_WEB_API.settings;
 using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 public static class ConfigureStaticFiles
 {
