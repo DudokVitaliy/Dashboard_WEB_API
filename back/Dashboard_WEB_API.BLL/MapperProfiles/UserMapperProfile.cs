@@ -9,8 +9,8 @@ namespace PD421_Dashboard_WEB_API.BLL.MapperProfiles
         public UserMapperProfile()
         {
             CreateMap<RegisterDto, ApplicationUser>()
-    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
-    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
 
         }
     }

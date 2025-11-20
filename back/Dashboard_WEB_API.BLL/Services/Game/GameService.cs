@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Dashboard_WEB_API.BLL.Dtos.Game;
-using Dashboard_WEB_API.BLL.Dtos.Genre;
 using Dashboard_WEB_API.BLL.Services.Storage;
 using Dashboard_WEB_API.DAL.Entities;
 using Dashboard_WEB_API.DAL.Repositories.GameRepositores;
@@ -17,8 +16,11 @@ namespace Dashboard_WEB_API.BLL.Services.Game
         private readonly IMapper _mapper;
         private readonly IStorageService _storageService;
 
-        public GameService(IGameRepository gameRepository, 
-            IGenreRepository genreRepository, IMapper mapper, IStorageService storageService)
+        public GameService(
+            IGameRepository gameRepository,
+            IGenreRepository genreRepository,
+            IMapper mapper,
+            IStorageService storageService)
         {
             _gameRepository = gameRepository;
             _genreRepository = genreRepository;
@@ -26,100 +28,71 @@ namespace Dashboard_WEB_API.BLL.Services.Game
             _storageService = storageService;
         }
 
-        public async Task<ServiceResponse> CreateAsync(CreateGameDto dto, string imagePath)
+        // ===================================================
+        // CREATE GAME
+        // ===================================================
+        public async Task<ServiceResponse> CreateAsync(CreateGameDto dto, string imageRoot)
         {
             var entity = _mapper.Map<GameEntity>(dto);
-            string gamePath = Path.Combine(imagePath, entity.Id);
-            Directory.CreateDirectory(gamePath);
 
-            // Збереження головного зображення
-            var mainImageName = await _storageService.SaveImageAsync(dto.MainImage, gamePath);
+            var genres = new List<GenreEntity>();
+            foreach (var genreId in dto.GenreId ?? [])
+            {
+                var g = await _genreRepository.GetByIdAsync(genreId);
+                if (g != null) genres.Add(g);
+            }
+            entity.Genres = genres;
+
+            string gameDir = Path.Combine(imageRoot, entity.Id);
+            Directory.CreateDirectory(gameDir);
+
+            var mainImageName = await _storageService.SaveImageAsync(dto.MainImage, gameDir);
             if (mainImageName == null)
             {
                 return new ServiceResponse
                 {
                     Message = "Не вдалося зберегти головне зображення гри",
                     IsSuccess = false,
-                    HttpStatusCode = System.Net.HttpStatusCode.InternalServerError
+                    HttpStatusCode = HttpStatusCode.InternalServerError
                 };
             }
 
-            var mainImage = new GameImageEntity
+            entity.Images.Add(new GameImageEntity
             {
                 GameId = entity.Id,
                 ImagePath = Path.Combine(entity.Id, mainImageName),
                 IsMain = true
-            };
-            entity.Images.Add(mainImage);
-
-            // Збереження додаткових зображень
-            var ImageNames = await _storageService.SaveImagesAsync(dto.Images, gamePath);
-            if (ImageNames.Count() == 0 )
-            {
-                return new ServiceResponse
-                {
-                    Message = "Не вдалося зберегти додаткові зображення гри",
-                    IsSuccess = false,
-                    HttpStatusCode = System.Net.HttpStatusCode.InternalServerError
-                };
-            }
-            var images = ImageNames.Select(name => new GameImageEntity
-            {
-                GameId = entity.Id,
-                ImagePath = Path.Combine(entity.Id, name),
-                IsMain = false
             });
-            foreach (var img in images)
-            {
-                entity.Images.Add(img);
-            }
-            await _gameRepository.CreateAsync(entity);
 
+            var imageNames = await _storageService.SaveImagesAsync(dto.Images, gameDir);
+
+            foreach (var name in imageNames)
+            {
+                entity.Images.Add(new GameImageEntity
+                {
+                    GameId = entity.Id,
+                    ImagePath = Path.Combine(entity.Id, name),
+                    IsMain = false
+                });
+            }
+
+            await _gameRepository.CreateAsync(entity);
 
             return new ServiceResponse
             {
-                Message = $"Гру з назвою {dto.Name} успішно створено",
+                Message = $"Гру '{dto.Name}' успішно створено",
                 IsSuccess = true,
-                HttpStatusCode = System.Net.HttpStatusCode.OK
+                HttpStatusCode = HttpStatusCode.OK
             };
-
-            //var genres = new List<GenreEntity>();
-            //foreach (var genreId in dto.GenreId ?? [])
-            //{
-            //    var genre = await _genreRepository.GetByIdAsync(genreId);
-            //    if (genre != null)
-            //        genres.Add(genre);
-            //}
-
-            //var entity = new GameEntity
-            //{
-            //    Name = dto.Name,
-            //    Description = dto.Description,
-            //    Price = dto.Price,
-            //    ReleaseDate = DateTime.SpecifyKind(dto.ReleaseDate, DateTimeKind.Utc),
-            //    Publisher = dto.Publisher,
-            //    Developer = dto.Developer,
-            //    Genres = genres
-            //};
-
-            //entity.Images = (dto.ImageUrl ?? []).Select((path, index) => new GameImageEntity
-            //{
-            //    ImagePath = path,
-            //    IsMain = index == 0,
-            //    GameId = entity.Id
-            //}).ToList();
-
-            //await _gameRepository.CreateAsync(entity);
-
-            //return new ServiceResponse
-            //{
-            //    Message = $"Гру з назвою {dto.Name} успішно створено",
-            //};
         }
-        public async Task<ServiceResponse> UpdateAsync(UpdateGameDto dto, string imagePath)
+        // ===================================================
+        // UPDATE GAME
+        // ===================================================
+        public async Task<ServiceResponse> UpdateAsync(UpdateGameDto dto, string imageRoot)
         {
             var entity = await _gameRepository.Games
                 .Include(g => g.Images)
+                .Include(g => g.Genres)
                 .FirstOrDefaultAsync(g => g.Id == dto.Id);
 
             if (entity == null)
@@ -139,18 +112,29 @@ namespace Dashboard_WEB_API.BLL.Services.Game
             if (!string.IsNullOrWhiteSpace(dto.Developer) && dto.Developer != "string") entity.Developer = dto.Developer;
             if (!string.IsNullOrWhiteSpace(dto.Publisher) && dto.Publisher != "string") entity.Publisher = dto.Publisher;
 
-            string gameDir = Path.Combine(imagePath, entity.Id);
+            if (dto.GenreId != null)
+            {
+                entity.Genres.Clear();
+
+                foreach (var genreId in dto.GenreId)
+                {
+                    var genre = await _genreRepository.GetByIdAsync(genreId);
+                    if (genre != null) entity.Genres.Add(genre);
+                }
+            }
+
+            string gameDir = Path.Combine(imageRoot, entity.Id);
+            Directory.CreateDirectory(gameDir);
 
             if (dto.DeleteImageIds != null && dto.DeleteImageIds.Any())
             {
                 var toDelete = entity.Images
-                    .Where(img => dto.DeleteImageIds.Contains(img.Id))
+                    .Where(i => dto.DeleteImageIds.Contains(i.Id))
                     .ToList();
 
                 foreach (var img in toDelete)
                 {
-                    string fullPath = Path.Combine(imagePath, img.ImagePath);
-
+                    string fullPath = Path.Combine(imageRoot, img.ImagePath);
                     if (File.Exists(fullPath))
                         File.Delete(fullPath);
 
@@ -160,13 +144,10 @@ namespace Dashboard_WEB_API.BLL.Services.Game
 
             if (dto.NewMainImage != null)
             {
-                Directory.CreateDirectory(gameDir);
-
                 var oldMain = entity.Images.FirstOrDefault(i => i.IsMain);
-
                 if (oldMain != null)
                 {
-                    string fullPath = Path.Combine(imagePath, oldMain.ImagePath);
+                    string fullPath = Path.Combine(imageRoot, oldMain.ImagePath);
                     if (File.Exists(fullPath))
                         File.Delete(fullPath);
 
@@ -174,16 +155,6 @@ namespace Dashboard_WEB_API.BLL.Services.Game
                 }
 
                 var fileName = await _storageService.SaveImageAsync(dto.NewMainImage, gameDir);
-
-                if (fileName == null)
-                {
-                    return new ServiceResponse
-                    {
-                        Message = "Не вдалося зберегти нове головне зображення",
-                        IsSuccess = false,
-                        HttpStatusCode = HttpStatusCode.InternalServerError
-                    };
-                }
 
                 entity.Images.Add(new GameImageEntity
                 {
@@ -195,16 +166,14 @@ namespace Dashboard_WEB_API.BLL.Services.Game
 
             if (dto.NewImages != null && dto.NewImages.Any())
             {
-                Directory.CreateDirectory(gameDir);
-
                 var fileNames = await _storageService.SaveImagesAsync(dto.NewImages, gameDir);
 
-                foreach (var fileName in fileNames)
+                foreach (var f in fileNames)
                 {
                     entity.Images.Add(new GameImageEntity
                     {
                         GameId = entity.Id,
-                        ImagePath = Path.Combine(entity.Id, fileName),
+                        ImagePath = Path.Combine(entity.Id, f),
                         IsMain = false
                     });
                 }
@@ -214,39 +183,54 @@ namespace Dashboard_WEB_API.BLL.Services.Game
 
             return new ServiceResponse
             {
-                Message = $"Інформацію про гру {entity.Name} оновлено",
+                Message = $"Гру '{entity.Name}' успішно оновлено",
                 IsSuccess = true,
                 HttpStatusCode = HttpStatusCode.OK
             };
         }
 
-        public async Task<ServiceResponse> DeleteAsync(string id, string imagePath)
+        // ===================================================
+        // DELETE GAME
+        // ===================================================
+        public async Task<ServiceResponse> DeleteAsync(string id, string imageRoot)
         {
-            var entity = await _gameRepository.GetByIdAsync(id);
+            var entity = await _gameRepository.Games
+                .Include(g => g.Genres)
+                .FirstOrDefaultAsync(g => g.Id == id);
+
             if (entity == null)
             {
                 return new ServiceResponse
-                { 
+                {
                     Message = $"Гру з id: {id} не знайдено",
                     IsSuccess = false,
-                    HttpStatusCode = System.Net.HttpStatusCode.BadRequest
+                    HttpStatusCode = HttpStatusCode.BadRequest
                 };
             }
 
-            await _storageService.DeleteAllImagesAsync(Path.Combine(imagePath, id));
+            entity.Genres.Clear();
+
+            string folder = Path.Combine(imageRoot, id);
+            await _storageService.DeleteAllImagesAsync(folder);
+
             await _gameRepository.DeleteAsync(entity);
 
             return new ServiceResponse
             {
-                Message = $"Гру з id: {id} успішно видалено",
+                Message = $"Гру '{entity.Name}' успішно видалено",
                 IsSuccess = true,
-                HttpStatusCode = System.Net.HttpStatusCode.OK
+                HttpStatusCode = HttpStatusCode.OK
             };
         }
+
+        // ===================================================
+        // GET BY ID
+        // ===================================================
         public async Task<ServiceResponse> GetByIdAsync(string id)
         {
             var game = await _gameRepository.Games
-                .Include(g => g.Images) 
+                .Include(g => g.Images)
+                .Include(g => g.Genres)
                 .FirstOrDefaultAsync(g => g.Id == id);
 
             if (game == null)
@@ -255,55 +239,51 @@ namespace Dashboard_WEB_API.BLL.Services.Game
                 {
                     Message = $"Гру з id: {id} не знайдено",
                     IsSuccess = false,
-                    HttpStatusCode = System.Net.HttpStatusCode.BadRequest
+                    HttpStatusCode = HttpStatusCode.BadRequest
                 };
             }
 
-            var gameDto = _mapper.Map<GameDto>(game);
-
             return new ServiceResponse
             {
-                Message = "Успішне отримання гри за id",
+                Message = "Успішно отримано гру",
                 IsSuccess = true,
-                HttpStatusCode = System.Net.HttpStatusCode.OK,
-                Data = gameDto
+                HttpStatusCode = HttpStatusCode.OK,
+                Data = _mapper.Map<GameDto>(game)
             };
         }
 
+        // ===================================================
+        // GET ALL
+        // ===================================================
         public async Task<ServiceResponse> GetAllAsync()
         {
-            var entities = await _gameRepository.Games
+            var games = await _gameRepository.Games
                 .Include(g => g.Images)
+                .Include(g => g.Genres)
                 .ToListAsync();
-
-            var dtos = _mapper.Map<List<GameDto>>(entities);
 
             return new ServiceResponse
             {
-                Message = "Успішне отримання всіх ігор",
+                Message = "Успішно отримано всі ігри",
                 IsSuccess = true,
-                HttpStatusCode = System.Net.HttpStatusCode.OK,
-                Data = dtos
+                HttpStatusCode = HttpStatusCode.OK,
+                Data = _mapper.Map<List<GameDto>>(games)
             };
         }
+
+        // ===================================================
+        // GET BY GENRE
+        // ===================================================
         public async Task<ServiceResponse> GetGamesByGenreAsync(string genreId)
         {
             var games = await _gameRepository.GetByGenreAsync(genreId);
+
             return new ServiceResponse
             {
-                Message = "Успішне отримання ігор за жанром",
+                Message = "Успішно отримано ігри за жанром",
                 IsSuccess = true,
-                HttpStatusCode = System.Net.HttpStatusCode.OK,
-                Data = games.Select(game => new GameDto
-                {
-                    Id = game.Id,
-                    Name = game.Name,
-                    Description = game.Description,
-                    Price = game.Price,
-                    ReleaseDate = game.ReleaseDate,
-                    Publisher = game.Publisher,
-                    Developer = game.Developer,
-                }),
+                HttpStatusCode = HttpStatusCode.OK,
+                Data = _mapper.Map<List<GameDto>>(games)
             };
         }
     }

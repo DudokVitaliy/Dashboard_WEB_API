@@ -1,4 +1,5 @@
-﻿using Dashboard_WEB_API.DAL.Entities;
+﻿using Dashboard_WEB_API.BLL.Dtos.Genre;
+using Dashboard_WEB_API.DAL.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,6 @@ namespace Dashboard_WEB_API.BLL.Dtos.Game
         
         public GameImageDto? MainImage { get; set; }
         public List<GameImageDto> Images { get; set; } = [];
+        public List<GenreDto> Genres { get; set; } = [];
     }
 }
