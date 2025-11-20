@@ -8,6 +8,7 @@ import { loginSucess } from './store/slices/authSlice';
 import RegisterPage from './pages/registerPage/RegisterPage';
 import GameListPage from './pages/gameListPage/GameListPage';
 import GameDetail from './pages/gameListPage/GameDetail';
+import CreateGamePage from './pages/gameListPage/CreateGamePage';
 function App() {
 
   const dispatch = useDispatch();
@@ -26,8 +27,11 @@ function App() {
           <Route index element={<MainPage />} />
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
-          <Route path='/game' element={<GameListPage />} />
-          <Route path="/games/:id" element={<GameDetail />} />
+          <Route path='/game'>
+            <Route index element = {<GameListPage/>} />
+            <Route path='create' element = {<CreateGamePage/>} />
+            <Route path=":id" element={<GameDetail />} />
+          </Route>
         </Route>
       </Routes>
     </>

@@ -38,7 +38,7 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
                 </CardContent>
             </CardActionArea>
             <CardActions>
-                <Link to = {`/games/${game.id}`} style={{ textDecoration: 'none' }}>
+                <Link to = {`${game.id}`} style={{ textDecoration: 'none' }}>
                     <Button size="small" color="primary">
                         Детальніше
                     </Button>

@@ -24,9 +24,14 @@ const gameApi = createApi({
             }),
             providesTags: (result, error, id) => [{ type: 'Games', id }],
         }),
+        createGame: build.mutation<ServiceResponse<null>, FormData>({
+            query: (formData) => ({ url: "/", method: "post", body: formData }),
+            invalidatesTags: ["Games"],
+        }),
+
     })
 
 });
 
-export const { useGetGamesQuery, useGetGameByIdQuery } = gameApi;
+export const { useGetGamesQuery, useGetGameByIdQuery, useCreateGameMutation  } = gameApi;
 export default gameApi;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace Dashboard_WEB_API.BLL.Dtos.Game
         public string? Publisher { get; set; }
         public string? Developer { get; set; }
         public List<string>? GenreId { get; set; }
-        public List<string>? ImageUrl { get; set; }
+        public IFormFile? NewMainImage { get; set; }
+        public List<IFormFile>? NewImages { get; set; }
+        public List<string>? DeleteImageIds { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Dashboard_WEB_API.DAL.Entities;
 using Dashboard_WEB_API.DAL.Repositories.GameRepositores;
 using Dashboard_WEB_API.DAL.Repositories.GenreRepositoryes;
 using Dashboard_WEB_API.settings;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -41,11 +42,14 @@ namespace Dashboard_WEB_API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateAsync([FromBody] UpdateGameDto dto)
+        public async Task<IActionResult> UpdateAsync([FromForm] UpdateGameDto dto)
         {
-            var response = await _gameService.UpdateAsync(dto);
+            string rootPath = _environment.ContentRootPath;
+            string imagesPath = Path.Combine(rootPath, StaticFilesSettings.StorageDirectory, StaticFilesSettings.ImagesDirectory);
+            var response = await _gameService.UpdateAsync(dto, imagesPath);
             return this.ToActionResult(response);
         }
+
 
         [HttpDelete]
         public async Task<IActionResult> DeleteAsync(string id)
