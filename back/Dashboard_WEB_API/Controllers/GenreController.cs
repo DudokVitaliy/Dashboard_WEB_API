@@ -15,9 +15,11 @@ namespace Dashboard_WEB_API.Controllers
     public class GenreController : ControllerBase
     {
         private readonly IGenreService _genreService;
-        public GenreController(IGenreService genreService)
+        private readonly ILogger<GenreController> _logger;
+        public GenreController(IGenreService genreService, ILogger<GenreController> logger)
         {
             _genreService = genreService;
+            _logger = logger;
         }
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateGenreDto dto)
@@ -50,6 +52,7 @@ namespace Dashboard_WEB_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetById(string? id)
         {
+            _logger.LogInformation("<== Work get method. Genre controller ==>");
             if (string.IsNullOrEmpty(id))
             {
                 var response = await _genreService.GetAllAsync();
