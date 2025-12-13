@@ -10,14 +10,13 @@ RUN npm i -g serve
 
 COPY . .
 
-ARG API_URL
-ARG IMAGES_URL
-
-ENV VITE_API_BASE_URL=$API_URL
-ENV VITE_IMAGES_URL=$IMAGES_URL
-
 RUN npm run build
 
-EXPOSE 5173
+FROM caddy:2-alpine
+
+COPY --from=build /app/dist /usr/share/caddy
+
+EXPOSE 80
+EXPOSE 443
 
 CMD [ "serve", "-s", "dist", "-p", "5173" ]
