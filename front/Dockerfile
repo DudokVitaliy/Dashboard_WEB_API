@@ -3,21 +3,15 @@ FROM node:22.21-alpine AS build
 WORKDIR /app
 
 COPY package*.json ./
-
 RUN npm ci
 
 COPY . .
-
 RUN npm run build
 
-FROM node:22.21-alpine
+FROM caddy:2-alpine
 
-WORKDIR /app
+COPY --from=build /app/dist /usr/share/caddy
 
-RUN npm i -g serve
+EXPOSE 80
+EXPOSE 443
 
-COPY --from=build /app/dist ./dist
-
-EXPOSE 5173
-
-CMD ["serve", "-s", "dist", "-l", "5173"]
