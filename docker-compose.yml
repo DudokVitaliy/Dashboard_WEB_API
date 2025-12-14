@@ -45,7 +45,7 @@ services:
     depends_on:
       - api
     ports:
-      - "80:5173"
+      - "8080:5173"
     networks:
       - pd421_gameshop
 
