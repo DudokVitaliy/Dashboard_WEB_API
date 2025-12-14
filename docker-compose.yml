@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: db
+    ports:
+      - "5433:5432"
+    environment:
+      - "POSTGRES_PASSWORD=qwerty"
+      - "POSTGRES_DB=pd421_games_store"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - pd421_gameshop
+
+  api:
+    build: ./back
+    image: potapchuk22/pd421_back
+    container_name: api
+    environment:
+      - ConnectionStrings__DefaultDb=User ID=postgres;Password=qwerty;Host=db;Port=5432;Database=pd421_games_store;
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5000:8080"
+    volumes:
+      - api:/app/storage
+    networks:
+      - pd421_gameshop
+
+  front:
+    build:
+      context: ./front
+      args:
+        - API_URL=http://localhost:5000/api
+        - IMAGES_URL=http://localhost:5000/images
+    image: potapchuk22/pd421_front
+    container_name: front
+    depends_on:
+      - api
+    ports:
+      - "80:5173"
+    networks:
+      - pd421_gameshop
+
+networks:
+  pd421_gameshop:
+    name: "pd421_gameshop"
+
+volumes:
+  db:
+    driver: local
+    name: "db"
+  api:
+    driver: local
+    name: "api"
