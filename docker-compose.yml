@@ -21,7 +21,7 @@ services:
 
   api:
     build:
-      context: ./back 
+      context: ./back
     container_name: api
     environment:
       - ConnectionStrings__DefaultDb=User ID=postgres;Password=qwerty;Host=db;Port=5432;Database=pd421_games_store;
@@ -39,8 +39,8 @@ services:
     build:
       context: ./front
       args:
-        - API_URL=http://localhost:5000/api
-        - IMAGES_URL=http://localhost:5000/images
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+        VITE_IMAGES_URL: ${VITE_IMAGES_URL}
     container_name: front
     depends_on:
       - api
